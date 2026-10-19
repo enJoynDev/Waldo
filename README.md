@@ -4,7 +4,7 @@ Depth-based corridor drift correction for mapless robot navigation (simulation-o
 Mini project for the Autonomous Systems course.
 Platform: **Windows 11 + VS Code + PyBullet (Python 3.11, conda)**. No hardware.
 
-Status: Phase 0 (setup + novelty check). See `docs/PLAN.md`.
+   Status: Sprint 0 (foundations). See `Plan.md` and `Progress.md`.
 
 ---
 
@@ -50,12 +50,18 @@ Full setup, VS Code configuration and troubleshooting: `docs/ENVIRONMENT.md`.
 ```
 waldo/
 ├── README.md
-├── CLAUDE.md                 # rules for AI assistants working in this repo
+├── CLAUDE.md
+├── Plan.md                   # sprint roadmap (current plan)
+├── Progress.md               # running log and decisions
+├── RequirementsAndSetup.md
+├── Rules.md
+├── TechStack.md
+├── pyproject.toml            # ruff and pytest settings                 # rules for AI assistants working in this repo
 ├── environment.yml
 ├── docs/
 │   ├── PROJECT_BRIEF.md      # problem, gap, hypotheses, scope, novelty framing
 │   ├── ENVIRONMENT.md        # Windows 11 + VS Code + conda + PyBullet setup
-│   ├── PLAN.md               # phases, checklists, risks
+│   ├── PLAN.md               # superseded by Plan.md
 │   ├── EXPERIMENTS.md        # variables, metrics, conditions, stats, plots
 │   └── REFERENCES.md         # sources and what was / was not read
 ├── src/
@@ -69,6 +75,7 @@ waldo/
 │   ├── run_experiments.py    # sweeps + multiprocessing -> CSV
 │   ├── plot_results.py
 │   └── smoke_test.py
+├── tests/
 ├── results/
 │   ├── raw.csv
 │   └── figures/

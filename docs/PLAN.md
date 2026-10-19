@@ -1,5 +1,6 @@
 # Plan
 
+> **Superseded by `Plan.md` in the repo root. Kept for history only; do not update.**
 Roughly 3 weeks. Compress or stretch to match your real deadline.
 Each phase has a "done when" so you can tell if you are actually finished.
 

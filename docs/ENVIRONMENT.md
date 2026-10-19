@@ -80,36 +80,17 @@ python -c "import pybullet, numpy, scipy, pandas, matplotlib; print('ok')"
 - Run from the **project root** so relative paths like `results\raw.csv` resolve correctly.
 - Debug with breakpoints in a single trial first (`run_trial.py`) before ever launching the multiprocessing sweep. Debugging spawned workers is much harder.
 
-## 5. Smoke test (`src\smoke_test.py`)
+   ## 5. Smoke test (`src\smoke_test.py`)
 
-Goal: prove PyBullet can start headless, build geometry, and render a depth image.
+   Goal: prove PyBullet can start headless, build a closed corridor, and render a correct, NaN-free metric depth image. Run it with `python src\smoke_test.py`.
 
-```python
-import numpy as np
-import pybullet as p
-import pybullet_data
-
-p.connect(p.DIRECT)                                   # headless, no window
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
-p.loadURDF("plane.urdf")
-
-near, far = 0.1, 10.0
-view = p.computeViewMatrixFromYawPitchRoll(
-    cameraTargetPosition=[0, 0, 0.3], distance=2.0,
-    yaw=0, pitch=-20, roll=0, upAxisIndex=2)
-proj = p.computeProjectionMatrixFOV(fov=87, aspect=320 / 240, nearVal=near, farVal=far)
-
-w, h, rgb, depth_buf, seg = p.getCameraImage(320, 240, view, proj)
-buf = np.array(depth_buf).reshape(h, w)
-
-# PyBullet returns a non-linear depth buffer in [0, 1]; convert to metres
-depth_m = far * near / (far - (far - near) * buf)
-print("depth image:", depth_m.shape, "min/max m:", depth_m.min(), depth_m.max())
-p.disconnect()
-```
-
-- Expected: prints a (240, 320) shape and depth values between roughly 0.1 and 10 m.
-- The 87 degree horizontal FOV is meant to approximate the D455 depth camera. Check the datasheet value when you write the report.
+   - What it checks:
+     - A wall placed exactly 3.0 m ahead reads 3.000 m at the centre pixel, which catches a wrong depth-buffer conversion.
+     - No pixel is NaN and all depths lie between near and far.
+     - One render is timed, to size the experiment sweep.
+   - Why the corridor has a ceiling: PyBullet's depth buffer returns NaN for rays that hit nothing, so every ray must hit a surface.
+   - FOV: PyBullet takes the *vertical* FOV. The script converts from the assumed 87 degree horizontal D455 FOV using the image aspect ratio.
+   - Expected output: shape (240, 320), 0 NaN pixels, centre depth about 3.000 m, then `SMOKE TEST PASSED`.
 
 ## 6. If the conda install of PyBullet fails
 
