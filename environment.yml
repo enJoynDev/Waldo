@@ -1,0 +1,15 @@
+name: corrdrift
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - tqdm
+  - ipykernel
+  - pybullet
+  # dev tools
+  - ruff
+  - pytest

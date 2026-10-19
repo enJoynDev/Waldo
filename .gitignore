@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Tool caches
+.ruff_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Secrets (none expected in this project, kept out by default)
+.env
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Local scratch
+scratch/
+*.log
