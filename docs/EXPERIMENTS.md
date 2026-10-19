@@ -13,7 +13,7 @@ If code disagrees with this file, update this file deliberately.
 - Nominal speed: 0.5 m/s. Physics/control step 1/240 s. Depth camera at 10 Hz.
 - Wheel base (track) b = 0.55 m. Verified: the Husky A200 manual gives a 550 mm track (about 0.555 m effective for skid steer). Using 0.55 m.
 - Start pose: centred, heading aligned with the corridor.
-- Camera: forward-facing, 87 degree horizontal FOV (D455 depth, per Intel's spec; the vertical FOV is derived from the image aspect ratio), mounted at about 0.4 m height (**unverified assumption**), metric depth after conversion. Depth readings closer than 0.52 m (the D455 minimum depth) are discarded in perception.
+- Camera: forward-facing, 87 degree horizontal FOV (D455 depth, per Intel's spec; the vertical FOV is derived from the image aspect ratio), mounted at about 0.4 m height (our choice; not given in the paper), metric depth after conversion. Depth readings closer than 0.52 m (the D455 minimum depth) are discarded in perception.
 
 ## 2. Drift model (what we inject)
 
