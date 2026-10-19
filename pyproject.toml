@@ -1,0 +1,15 @@
+# Tool configuration only. This project is not packaged; code runs as scripts from the repo root.
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: import sorting, B: bugbear (common bugs)
+select = ["E", "W", "F", "I", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# lets tests do `from world import ...` without installing anything
+pythonpath = ["src"]
