@@ -11,9 +11,9 @@ If code disagrees with this file, update this file deliberately.
 - Subgoal: drive straight for L = 10 m (matches the paper's 10 m subgoal cap).
 - Robot footprint: 0.99 m x 0.67 m (Husky-like, from the paper). Clearance to each wall when centred: (2.0 - 0.67) / 2 = 0.665 m.
 - Nominal speed: 0.5 m/s. Physics/control step 1/240 s. Depth camera at 10 Hz.
-- Wheel base (track) b = 0.55 m. **Assumption, check the Husky datasheet.**
+- Wheel base (track) b = 0.55 m. Verified: the Husky A200 manual gives a 550 mm track (about 0.555 m effective for skid steer). Using 0.55 m.
 - Start pose: centred, heading aligned with the corridor.
-- Camera: forward-facing, about 87 degree horizontal FOV, mounted at about 0.4 m height, metric depth after conversion.
+- Camera: forward-facing, 87 degree horizontal FOV (D455 depth, per Intel's spec; the vertical FOV is derived from the image aspect ratio), mounted at about 0.4 m height (**unverified assumption**), metric depth after conversion. Depth readings closer than 0.52 m (the D455 minimum depth) are discarded in perception.
 
 ## 2. Drift model (what we inject)
 
@@ -22,6 +22,9 @@ If code disagrees with this file, update this file deliberately.
   - **Wheel-scale mismatch** `eps_L`, `eps_R` (fractional error). Wheel speeds become `v*(1+eps)`. Produces heading drift. Sweep variable is `d_eps = eps_R - eps_L`.
   - **Lateral skid** `s_lat`: small sideways velocity proportional to forward speed. Produces cross-track drift that heading alone does not reveal.
   - **Random noise** `sigma_w`: Gaussian noise on wheel speeds each step. Produces random-walk drift.
+- Defaults (our choices): `s_lat = 0`, `sigma_w = 1%`. The mismatch is split symmetrically: `eps_L = -d_eps/2`, `eps_R = +d_eps/2`.
+- `sigma_w` is the fractional standard deviation of each wheel's speed, drawn independently per wheel every 0.1 s. At L = 10 m this gives roughly 1 degree of heading std and 0.1 m of lateral std (hand estimate, to be checked in Sprint 1).
+- Why `sigma_w` is not zero: the simulation is deterministic, so with zero noise all 30 seeds would give identical results. The analytic check in section 6 is the only run with `sigma_w = 0`.
 - Seeded per trial. Same seed gives the same noise sequence across modes, so comparisons are paired.
 
 ## 3. Conditions (what is compared)
@@ -29,12 +32,13 @@ If code disagrees with this file, update this file deliberately.
 - Modes (controller variants):
   - `B1` baseline: odometry only (encoders). No correction.
   - `B2` baseline: encoders + simulated gyro heading (gyro has a constant bias and noise). **Fairer baseline, because the source paper also uses an IMU.**
+  - Gyro defaults (our choices, not from a datasheet): constant bias 0.1 deg/s, white noise 0.05 deg/s std. The bias sweep in section 11 uses {0, 0.1, 0.5, 1} deg/s.
   - `C_lat`: depth correction using lateral offset only.
   - `C_head`: depth correction using heading error only.
   - `C_both`: depth correction using both. This is the main method.
 - Independent variables:
   - Drift severity `d_eps` in {0, 0.25%, 0.5%, 1%, 2%} (see section 6 for why these values).
-  - Depth noise `sigma_d` in {0, 0.02, 0.05} m (Gaussian on metric depth). Secondary sweep at one fixed drift level.
+  - Depth noise `sigma_d` in {0, 0.02, 0.05} m (Gaussian on metric depth). Secondary sweep at fixed d_eps = 1%.
   - Optional: lateral skid `s_lat` in {0, 1%, 2%} at fixed `d_eps`.
 - Trials: **30 per condition** (RRT-style stochastic noise needs repeats; same logic applies here).
 - Seeds: 0 to 29 for reported results. **1000 to 1099 reserved for tuning gains.** Never tune on reported seeds.
@@ -61,7 +65,7 @@ If code disagrees with this file, update this file deliberately.
   - lateral offset = (distance to left wall - distance to right wall) / 2
   - confidence = inlier ratio and agreement between the two wall angles (walls should be nearly parallel)
 - Controller: `omega = omega_nominal + k_lat * lat_err + k_head * head_err`, with `omega` clipped.
-- If confidence is below threshold, hold the last correction briefly, then fall back to odometry-only.
+- If confidence is below threshold, hold the last correction briefly, then fall back to odometry-only. The threshold value is set in Sprint 2 from the perception tests and recorded here.
 
 ## 6. Sanity check and why the sweep values were chosen
 
