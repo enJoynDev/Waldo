@@ -9,7 +9,7 @@ Rule: a sprint entry is written, and GitHub is updated (commit + push + PR merge
 
 | Sprint | Name | Status | Start | End | Tag |
 |---|---|---|---|---|---|
-| 0 | Foundations | In progress | 2026-10-05 | | none |
+| 0 | Foundations | Done | 2026-10-05 | 2026-10-20 | none |
 | 1 | World, drift model, metrics | Not started | | | `v0.1.0` |
 | 2 | Perception | Not started | | | `v0.2.0` |
 | 3 | Controller and closed loop | Not started | | | `v0.3.0` |
@@ -21,8 +21,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 ## 2. Current focus
 
-- Sprint 0: only the novelty notes and closing the sprint (PR and merge) remain.
-- Next concrete action: read the three closest papers and write the notes in `docs/REFERENCES.md`.
+- Sprint 1: world, drift model, metrics, analytic check.
+- Next concrete action: create branch `sprint-1-world-drift` and start with issue #1 (`config.py`).
 
 ## 3. Decisions log
 
@@ -90,9 +90,10 @@ Each decision: what, why, alternative rejected.
 
 ## 6. Sprint log
 
-### Sprint 0: Foundations (in progress)
+### Sprint 0: Foundations (done)
 
 - Started: 2026-10-05
+- Ended: 2026-10-20
 - Done so far:
   - Conda env `corrdrift` built from `environment.yml`; versions recorded in `TechStack.md`.
   - Repo `enJoynDev/Waldo` created; `.gitignore`, `.gitattributes`, `pyproject.toml` (ruff and pytest) added.
