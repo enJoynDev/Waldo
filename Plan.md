@@ -48,7 +48,7 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
 
 ## 5. Sprint details
 
-### Sprint 0: Foundations (status: in progress, started 2026-10-05)
+### Sprint 0: Foundations (status: done 2026-10-20, started 2026-10-05; novelty check carried forward)
 - Tasks:
   - [x] Draft project docs (README, brief, environment, experiments, references)
   - [x] Write the proposal (markdown and Word versions)
