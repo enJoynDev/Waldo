@@ -60,6 +60,7 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   - [ ] Time one depth render to budget total sweep runtime
   - [ ] Verify assumed parameters: wheel base `b`, camera FOV, camera height, Husky footprint
   - [ ] Novelty check: run the searches listed in `docs/REFERENCES.md`; write positioning notes
+       - Deferred on 2026-10-20 by choice. Must be done before Sprint 6 (the report) and before any prior-work claim is written.
   - [ ] Add `ruff` config; confirm `ruff check` and `ruff format` run
   - [ ] Open GitHub Issues for Sprint 1 tasks
 - DoD: smoke test prints a depth image shape and plausible metric range; repo is on GitHub; novelty notes are written; `Progress.md` has the Sprint 0 entry.
