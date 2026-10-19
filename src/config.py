@@ -40,6 +40,8 @@ SUBGOAL_DIST = 10.0  # the source paper's 10 m subgoal cap
 DT = 1 / 240  # kinematic integration step
 CAMERA_PERIOD = 0.1  # depth camera at 10 Hz
 NOISE_PERIOD = 0.1  # wheel noise is redrawn this often so it random-walks, not averages out
+MAX_TRIAL_TIME = 40.0  # safety stop: twice the nominal drive time
+NOISE_N = int(MAX_TRIAL_TIME / NOISE_PERIOD) + 1  # noise samples drawn per trial
 
 # --- depth camera (D455-like) ---
 IMG_W = 160
