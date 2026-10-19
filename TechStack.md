@@ -99,12 +99,12 @@ Versions are targets; record the exact installed versions in `Progress.md` after
 
 | Package | Installed version |
 |---|---|
-| Python | |
-| numpy | |
-| scipy | |
-| pandas | |
-| matplotlib | |
-| pybullet | |
-| ruff | |
-| pytest | |
-| tqdm | |
+| Python | 3.11.17 |
+| numpy | 2.4.6 |
+| scipy | 1.17.1 | - scipy was installed via pip inside the conda env (shown as `pypi` in `conda list`); all other packages are from conda-forge.
+| pandas | 3.0.6 |
+| matplotlib | 3.11.2 |
+| pybullet | 3.25 |
+| ruff | 0.17.1 |
+| pytest | 9.1.1 |
+| tqdm | 4.70.1 |
