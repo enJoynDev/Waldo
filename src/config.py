@@ -5,6 +5,7 @@ SI units; angles in radians unless the name ends in _DEG.
 Drift values are fractions (0.01 = 1%).
 """
 
+import math
 from pathlib import Path
 
 # --- paths (pathlib only, never a hard-coded C:\ path) ---
@@ -24,6 +25,7 @@ WALL_THICKNESS = 0.1
 # --- robot (Husky A200 footprint from the source paper) ---
 ROBOT_LENGTH = 0.99
 ROBOT_WIDTH = 0.67
+ROBOT_HEIGHT = 0.4  # only matters for the collision shape; the robot is never rendered
 WHEEL_BASE = 0.55  # track width b; Husky manual says 550 mm
 SPEED = 0.5  # nominal forward speed
 CLEARANCE = (CORRIDOR_WIDTH - ROBOT_WIDTH) / 2  # wall gap when centred, 0.665 m
@@ -43,6 +45,8 @@ NOISE_PERIOD = 0.1  # wheel noise is redrawn this often so it random-walks, not 
 IMG_W = 160
 IMG_H = 120
 FOV_H_DEG = 87.0  # horizontal; PyBullet needs vertical, converted in world.py
+# PyBullet wants the vertical FOV; derive it from the aspect ratio
+FOV_V_DEG = math.degrees(2 * math.atan(math.tan(math.radians(FOV_H_DEG) / 2) * IMG_H / IMG_W))
 NEAR = 0.1  # render clipping plane
 FAR = 10.0
 CAMERA_HEIGHT = 0.4  # our choice, not given in the paper
