@@ -21,8 +21,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 ## 2. Current focus
 
-- Sprint 0: finish environment setup and the novelty check.
-- Next concrete action: choose the final project name, create the GitHub repo, run the smoke test.
+- Sprint 0: only the novelty notes and closing the sprint (PR and merge) remain.
+- Next concrete action: read the three closest papers and write the notes in `docs/REFERENCES.md`.
 
 ## 3. Decisions log
 
@@ -47,18 +47,40 @@ Each decision: what, why, alternative rejected.
 - **2026-10-19: Project name is WALDO (Wall-Aided Lateral Drift Offsetting); repo and folder `waldo`.**
   - Why: short, memorable, describes what it does (wall-aided, lateral drift).
   - Rejected: CORD, DriftLock, Centerline.
-  
+- **2026-10-19: The corridor in `world.py` is fully enclosed, with a ceiling.**
+  - Why: PyBullet's depth buffer returns NaN for rays that hit nothing (seen in an earlier test with open-top walls), and perception must never see NaN.
+  - Rejected: replacing NaN after rendering (hides real no-return pixels).
+- **2026-10-19: PyBullet gets the vertical FOV, converted from the 87 degree horizontal one.**
+  - Why: `computeProjectionMatrixFOV` takes the vertical FOV; passing 87 would silently widen the horizontal view.
+  - Rejected: passing 87 directly.
+- **2026-10-19: Default wheel noise `sigma_w` is 1%, never zero in the main sweep.**
+  - Why: the simulation is deterministic, so with zero noise all 30 seeds would give identical results.
+  - Rejected: `sigma_w = 0` (fake confidence intervals).
+- **2026-10-19: Gyro defaults for `B2`: bias 0.1 deg/s, noise 0.05 deg/s.**
+  - Why: our own choice for a plausible MEMS gyro; swept in Sprint 5.
+  - Rejected: no gyro bias (would make `B2` unrealistically good).
+- **2026-10-19: Retired `docs/PLAN.md` in favour of `Plan.md`.**
+  - Why: two plan files disagreed (`B2` timing); one source of truth.
+  - Rejected: keeping both in sync by hand.
+- **2026-10-20: Novelty check deferred; Sprint 0 closed without it.**
+  - Why: it is reading and writing only, and nothing in Sprints 1 to 5 depends on it.
+  - Rejected: holding Sprint 0 open (it would block all code work).
+  - Condition: the notes in `docs/REFERENCES.md` are written before Sprint 6, and nothing is cited as read until it is.
+
 ## 4. Assumptions still to verify
 
 | Assumption | Value used | Verify against | Status |
 |---|---|---|---|
-| Wheel base `b` | 0.55 m | Husky A200 datasheet | Open |
-| Camera horizontal FOV | 87 degrees | RealSense D455 datasheet | Open |
-| Camera height | 0.4 m | Husky + D455 mounting in the paper's figures | Open |
+| Wheel base `b` | 0.55 m | Husky A200 datasheet | Verified |
+| Camera horizontal FOV | 87 degrees | RealSense D455 datasheet | Verified |
+| Camera height | 0.4 m | Husky + D455 mounting in the paper's figures | Our choice (not given in the paper) |
 | Robot footprint | 0.99 m x 0.67 m | The paper's text (988 mm x 670 mm) | Taken from paper |
 | Corridor width | 2.0 m | Our choice | Fixed |
 | Success threshold | 0.15 m lateral | Our choice | Fixed |
 | Paper drift safety radius `d_s` | 0.2 m | Our choice | Fixed |
+| Camera minimum depth | 0.52 m | D455 spec; perception discards closer readings | Verified |
+| Default wheel noise sigma_w | 1% per 0.1 s | Our choice | Fixed |
+| Gyro bias / noise (B2) | 0.1 / 0.05 deg/s | Our choice, not from a datasheet | Fixed |
 
 ## 5. Open questions
 
@@ -72,13 +94,13 @@ Each decision: what, why, alternative rejected.
 
 - Started: 2026-10-05
 - Done so far:
-  - Chose the project: depth-based corridor drift correction (gap 1 of arXiv:2609.14297).
-  - Wrote README, CLAUDE.md, environment.yml, and docs: PROJECT_BRIEF, ENVIRONMENT, PLAN, EXPERIMENTS, REFERENCES.
-  - Wrote the proposal in markdown and Word.
-  - Wrote the five working docs (this set).
-- Remaining: see Sprint 0 task list in `Plan.md`.
-- Blockers: none.
-- Commit / PR: not yet created.
+  - Conda env `corrdrift` built from `environment.yml`; versions recorded in `TechStack.md`.
+  - Repo `enJoynDev/Waldo` created; `.gitignore`, `.gitattributes`, `pyproject.toml` (ruff and pytest) added.
+  - Smoke test passes: shape (240, 320), 0 NaN pixels, centre pixel 3.000 m, 36.7 ms per frame at 320x240.
+  - Docs synced and renamed to WALDO; `docs/EXPERIMENTS.md` parameters filled in.
+  - Sprint 1 issues #1 to #7 opened.
+- Remaining (carried forward): novelty notes in `docs/REFERENCES.md`. See the decision of 2026-10-20.
+- Branch: `sprint-0-foundations`.
 
 <!-- Template for each new sprint entry:
 
