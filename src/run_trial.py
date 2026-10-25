@@ -66,6 +66,7 @@ def run_trial(world, mode, seed, params, sigma_d=C.SIGMA_D_DEFAULT, on_step=None
         "d_eps": params["d_eps"],
         "s_lat": params["s_lat"],
         "sigma_w": params["sigma_w"],
+        "gyro_bias_deg_s": params["gyro_bias_deg_s"],
         "sigma_d": sigma_d,
     }
     row.update(M.trial_metrics(state["true"], max_abs_y, collided))

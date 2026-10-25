@@ -14,15 +14,15 @@ Rule: a sprint entry is written, and GitHub is updated (commit + push + PR merge
 | 2 | Perception | Done | 2026-10-25 | 2026-10-25 | `v0.2.0` |
 | 3 | Controller and closed loop | Done | 2026-10-25 | 2026-10-25 | `v0.3.0` |
 | 4 | Experiments | Done | 2026-10-25 | 2026-10-25 | `v0.4.0` |
-| 5 | Analysis and stress tests | Not started | | | `v0.5.0` |
+| 5 | Analysis and stress tests | Done | 2026-10-25 | 2026-10-25 | `v0.5.0` |
 | 6 | Write-up and release | Not started | | | `v1.0.0` |
 
 Status values: Not started, In progress, Blocked, Done.
 
 ## 2. Current focus
 
-- Sprint 5: analysis and stress tests (skid and gyro-bias sweeps, paired statistics, optional doorway test).
-- Next concrete action: create branch `sprint-5-analysis` and open the Sprint 5 issues.
+- Sprint 6: write-up and release (README results, docs sync, tag `v1.0.0`).
+- Next concrete action: write the novelty notes in `docs/REFERENCES.md`, then create branch `sprint-6-release` and open the Sprint 6 issues.
 
 ## 3. Decisions log
 
@@ -66,6 +66,12 @@ Each decision: what, why, alternative rejected.
   - Why: it is reading and writing only, and nothing in Sprints 1 to 5 depends on it.
   - Rejected: holding Sprint 0 open (it would block all code work).
   - Condition: the notes in `docs/REFERENCES.md` are written before Sprint 6, and nothing is cited as read until it is.
+- **2026-10-25: Doorway is an option of `create_world(doorway=None)`, not a separate world.**
+  - Why: the default corridor and all earlier results stay untouched; the gap has an alcove behind it so depth stays finite (no NaN rays).
+  - Rejected: an open gap with nothing behind it (NaN depth, which perception must never see).
+- **2026-10-25: Confidence threshold kept at 0.5 after the doorway test.**
+  - Why: it rejected 82% of frames where a wall has a gap ahead and none in the normal corridor.
+  - Rejected: retuning on a single scenario.
 
 ## 4. Assumptions still to verify
 
@@ -210,6 +216,25 @@ Depth noise at 1% drift, `C_both`: 0.0043 m at sigma_d = 0, 0.0044 m at 0.02 and
 
 **Honesty notes:** the B2 result above is an artefact of the bias sign, not a general property of gyro-aided odometry; clean simulated walls and injected drift favour the camera modes; no statistical test has been run yet (Sprint 5).
 
+### Sprint 5: Analysis and stress tests (2026-10-25) — Done
+
+**Delivered:** generalised runner with a `stress` mode, skid and gyro-bias sweeps with figures 6 and 7, paired statistics (`analysis.py`, `results/stats.csv`), doorway test (`doorway_test.py`, `results/doorway.csv`), updated threats to validity (issues #29–#34). 85 tests passing. Stress sweep: 720 rows in about 94 s.
+
+**Results**
+- 40 paired comparisons (Wilcoxon signed-rank by seed, Bonferroni over 40): 37 significant at 0.05.
+- `C_both` beats `B1` and `B2` in 29 or 30 of 30 seeds in every condition, and `C_head` everywhere.
+- `C_both` vs `C_lat`: better at 0 to 0.5% drift, borderline at 1% (p = 0.063), tied at 2%, and worse under skid (2% skid: 0.0244 m vs 0.0165 m, p = 0.008). The lateral term carries most of the benefit.
+- `C_head` fails under skid. `B2` is competitive only at zero gyro bias, still 8 to 10 times worse than `C_both`, and collides at a bias magnitude of 0.5 deg/s and above.
+- Doorway test (1.5 m gap, left wall, alcove behind): the gate rejected 14% of frames at 2 to 3 m and 82% at 3 to 4 m, 0% elsewhere; 10 of 10 successes, no collisions, mean error 0.0041 m in both worlds.
+
+**Decisions**
+- Statistics are paired by seed and corrected over all 40 comparisons at once.
+- The doorway is an option of `create_world`, so earlier results are unchanged.
+- Threshold 0.5 kept.
+
+**Honesty notes:** the fallback was shown to trigger, but only briefly (1 to 2 m at 1% drift), so it is not shown safe over long gaps or at high drift. The `C_both` advantage over `C_lat` is not general. `B2` is a simple heading-hold without bias estimation. Depth noise is per-pixel Gaussian, so the noise-robustness result is optimistic. Full list in `docs/EXPERIMENTS.md`, section 12.
+
+**Commit / PR / tag:** PR and tag `v0.5.0` after merge.
 <!-- Template for each new sprint entry:
 
 ### Sprint N: Name (status)
