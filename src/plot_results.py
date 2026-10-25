@@ -5,6 +5,8 @@ import pandas as pd
 from scipy import stats
 
 import config as C
+import sprint3_check as S
+import world as W
 
 STYLE = {  # one colour and marker per mode, the same in every figure
     "B1": ("#c4571a", "o"),
@@ -116,7 +118,7 @@ def fig2_collision_rate(df, path):
             lows.append(k / n - lo)
             highs.append(hi - k / n)
             # small x offset per mode so overlapping lines stay visible
-        x = np.arange(len(levels)) + (i - 2) * 0.04
+        x = np.arange(len(levels)) + (i - 2) * 0.08
         ax.errorbar(
             x, rates, yerr=[lows, highs], color=color, marker=marker, lw=2, capsize=3, label=mode
         )
@@ -176,6 +178,31 @@ def fig5_ablation(df, path):
     _finish(fig, ax, path)
 
 
+def fig3_trajectories(path):
+    import matplotlib.pyplot as plt
+
+    world = W.create_world()
+    fig, ax = plt.subplots(figsize=(10, 3))
+    for i, seed in enumerate(C.SEEDS_REPORT[:5]):
+        for mode in ("B1", "B2", "C_both"):
+            xs, ys = S.trajectory(world, mode, seed)
+            ax.plot(xs, ys, color=STYLE[mode][0], lw=1.6, label=mode if i == 0 else None)
+    W.close_world()
+    half = C.CORRIDOR_WIDTH / 2
+    for y in (half, -half):
+        ax.axhline(y, color="black", lw=2)  # walls
+    for y in (C.CLEARANCE, -C.CLEARANCE):
+        ax.axhline(y, color="gray", lw=1, ls=":")  # robot centre at this y means it touches
+    ax.text(0.1, C.CLEARANCE + 0.03, "collision limit", color="gray", va="bottom")
+    ax.set_xlim(0, C.SUBGOAL_DIST)
+    ax.set_ylim(-half - 0.1, half + 0.1)
+    ax.set_xlabel("Forward distance x (m)")
+    ax.set_ylabel("Lateral position y (m)")
+    ax.set_aspect("equal")
+    ax.legend(**LEGEND)
+    _finish(fig, ax, path)
+
+
 def main():
     df = load()
     table = summary_table(df)
@@ -185,6 +212,7 @@ def main():
     fig2_collision_rate(df, C.FIGURES_DIR / "fig2_collision_rate.png")
     fig4_depth_noise(df, C.FIGURES_DIR / "fig4_depth_noise.png")
     fig5_ablation(df, C.FIGURES_DIR / "fig5_ablation.png")
+    fig3_trajectories(C.FIGURES_DIR / "fig3_trajectories.png")
 
 
 if __name__ == "__main__":
