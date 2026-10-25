@@ -56,6 +56,9 @@ CAMERA_MIN_DEPTH = 0.52  # D455 minimum depth; perception discards closer readin
 CAMERA_MAX_DEPTH = 9.9  # readings at the far clip (just under FAR) mean "nothing hit"; discard
 WALL_Z_MIN = 0.15  # perception keeps points between these heights: drops floor and ceiling
 WALL_Z_MAX = 0.85  # (our choice; margins cover the renderer's depth error)
+RANSAC_ITERS = 100
+RANSAC_THRESHOLD = 0.05  # inlier distance in metres; above the renderer's ~3 cm wall scatter
+RANSAC_MIN_POINTS = 20  # fewer points than this and no fit is attempted
 
 # --- injected drift (defaults; applied to the TRUE pose only) ---
 D_EPS_DEFAULT = 0.0  # wheel-scale mismatch eps_R - eps_L, split symmetrically

@@ -28,3 +28,31 @@ def wall_points_2d(points):
     """Keep only wall-height points and drop z: top-down (x, y) points, shape (N, 2)."""
     keep = (points[:, 2] > C.WALL_Z_MIN) & (points[:, 2] < C.WALL_Z_MAX)
     return points[keep][:, :2]
+
+
+def ransac_line(xy, rng):
+    """Fit y = a*x + b to (N, 2) points with RANSAC.
+
+    Returns (a, b, n_inliers), or None if there are fewer than RANSAC_MIN_POINTS points.
+    Each iteration fits a line through two random points; the line with the most points
+    within RANSAC_THRESHOLD (vertical distance, metres) wins and is refitted by least
+    squares on its inliers.
+    """
+    n = len(xy)
+    if n < C.RANSAC_MIN_POINTS:
+        return None
+    x, y = xy[:, 0], xy[:, 1]
+    i, j = rng.integers(0, n, size=(2, C.RANSAC_ITERS))
+    dx = x[j] - x[i]
+    ok = np.abs(dx) > 1e-6  # a pair with equal x gives no usable line
+    i, j, dx = i[ok], j[ok], dx[ok]
+    if len(i) == 0:
+        return None
+    a = (y[j] - y[i]) / dx
+    b = y[i] - a * x[i]
+    resid = np.abs(y[None, :] - (a[:, None] * x[None, :] + b[:, None]))  # (iters, N)
+    inliers = resid < C.RANSAC_THRESHOLD
+    best = np.argmax(inliers.sum(axis=1))
+    mask = inliers[best]
+    a, b = np.polyfit(x[mask], y[mask], 1)
+    return float(a), float(b), int(mask.sum())
