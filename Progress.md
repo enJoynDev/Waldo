@@ -159,7 +159,7 @@ Targets (offset under 0.05 m, heading under 2 degrees at zero noise) met by a wi
 
 ### Sprint 3: Controller and closed loop (2026-10-25) — Done
 
-**Delivered:** `control.py`, all five modes in `run_trial.py`, `tune_gains.py`, `sprint3_check.py`, closed-loop tests (issues #16–#20). All tests passing.
+**Delivered:** `control.py`, all five modes in `run_trial.py`, `tune_gains.py`, `sprint3_check.py`, closed-loop tests (issues #17–#21). All tests passing.
 
 **Results** (100 tuning seeds, `d_eps` = 1%)
 
