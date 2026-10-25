@@ -14,15 +14,15 @@ Rule: a sprint entry is written, and GitHub is updated (commit + push + PR merge
 | 2 | Perception | Done | 2026-10-25 | 2026-10-25 | `v0.2.0` |
 | 3 | Controller and closed loop | Done | 2026-10-25 | 2026-10-25 | `v0.3.0` |
 | 4 | Experiments | Done | 2026-10-25 | 2026-10-25 | `v0.4.0` |
-| 5 | Analysis and stress tests | Not started | | | `v0.5.0` |
+| 5 | Analysis and stress tests | Done | 2026-10-25 | 2026-10-25 | `v0.5.0` |
 | 6 | Write-up and release | Not started | | | `v1.0.0` |
 
 Status values: Not started, In progress, Blocked, Done.
 
 ## 2. Current focus
 
-- Sprint 5: analysis and stress tests (skid and gyro-bias sweeps, paired statistics, optional doorway test).
-- Next concrete action: create branch `sprint-5-analysis` and open the Sprint 5 issues.
+- Sprint 6: write-up and release (README results, docs sync, tag `v1.0.0`).
+- Next concrete action: write the novelty notes in `docs/REFERENCES.md`, then create branch `sprint-6-writeup` and open the Sprint 6 issues.
 
 ## 3. Decisions log
 
@@ -66,6 +66,12 @@ Each decision: what, why, alternative rejected.
   - Why: it is reading and writing only, and nothing in Sprints 1 to 5 depends on it.
   - Rejected: holding Sprint 0 open (it would block all code work).
   - Condition: the notes in `docs/REFERENCES.md` are written before Sprint 6, and nothing is cited as read until it is.
+- **2026-10-25: Doorway is an option of `create_world(doorway=None)`, not a separate world.**
+  - Why: the default corridor and all earlier results stay untouched; the gap has an alcove behind it so depth stays finite (no NaN rays).
+  - Rejected: an open gap with nothing behind it (NaN depth, which perception must never see).
+- **2026-10-25: Confidence threshold kept at 0.5 after the doorway test.**
+  - Why: it rejected 82% of frames where a wall has a gap ahead and none in the normal corridor.
+  - Rejected: retuning on a single scenario.
 
 ## 4. Assumptions still to verify
 
