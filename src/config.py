@@ -61,6 +61,17 @@ RANSAC_THRESHOLD = 0.05  # inlier distance in metres; above the renderer's ~3 cm
 RANSAC_MIN_POINTS = 20  # fewer points than this and no fit is attempted
 CONF_WIDTH_TOL = 0.5  # corridor-width error (m) at which confidence drops to zero
 CONF_THRESHOLD = 0.5  # Below this, falls back to odometry (provisional; see `EXPERIMENTS.md`).
+# controller gains: omega = -(K_LAT * offset + K_HEAD * heading), starting values, tuned later
+# controller gains: omega = -(K_LAT * offset + K_HEAD * heading); tuned on seeds 1000-1049
+K_LAT = 2.0  # rad/s per metre of lateral offset
+K_HEAD = 2.0  # rad/s per radian of heading error
+OMEGA_MAX = 0.5  # rad/s, clip on the correction
+CONTROL_HOLD_FRAMES = 3  # camera frames to hold the last correction when confidence is low
+# gain grid search (Sprint 3), run on tuning seeds only
+GAIN_GRID_K_LAT = (0.25, 0.5, 1.0, 2.0, 4.0)
+GAIN_GRID_K_HEAD = (0.5, 1.0, 1.5, 2.0, 3.0)
+GAIN_GRID_D_EPS = (0.0, 0.01)  # no drift (jitter check) and the Sprint 3 DoD level
+GAIN_GRID_N_SEEDS = 50  # first 50 of SEEDS_TUNE; keeps the grid to about 10 to 15 minutes
 PERCEPTION_GRID_Y = (-0.4, -0.2, 0.0, 0.2, 0.4)  # lateral offsets for the perception test grid
 PERCEPTION_GRID_HEAD_DEG = (-8.0, -4.0, 0.0, 4.0, 8.0)  # heading errors for the grid
 PERCEPTION_OFFSET_TARGET = 0.05  # m, Sprint 2 target at zero depth noise
