@@ -60,6 +60,13 @@ RANSAC_ITERS = 100
 RANSAC_THRESHOLD = 0.05  # inlier distance in metres; above the renderer's ~3 cm wall scatter
 RANSAC_MIN_POINTS = 20  # fewer points than this and no fit is attempted
 CONF_WIDTH_TOL = 0.5  # corridor-width error (m) at which confidence drops to zero
+CONF_THRESHOLD = (
+    0.5  # below this the controller falls back to odometry; provisional, see EXPERIMENTS.md
+)
+PERCEPTION_GRID_Y = (-0.4, -0.2, 0.0, 0.2, 0.4)  # lateral offsets for the perception test grid
+PERCEPTION_GRID_HEAD_DEG = (-8.0, -4.0, 0.0, 4.0, 8.0)  # heading errors for the grid
+PERCEPTION_OFFSET_TARGET = 0.05  # m, Sprint 2 target at zero depth noise
+PERCEPTION_HEAD_TARGET_DEG = 2.0  # degrees, same
 
 # --- injected drift (defaults; applied to the TRUE pose only) ---
 D_EPS_DEFAULT = 0.0  # wheel-scale mismatch eps_R - eps_L, split symmetrically

@@ -16,7 +16,9 @@ def depth_to_points(depth):
     or at the far clip (FAR, meaning "nothing hit") are dropped. Returns an (N, 3) array.
     """
     f = (C.IMG_W / 2) / math.tan(math.radians(C.FOV_H_DEG) / 2)  # focal length in pixels
-    u, v = np.meshgrid(np.arange(C.IMG_W) + 0.5, np.arange(C.IMG_H) + 0.5)
+    # PyBullet's depth image puts the ray for pixel (col, row) through the integer index,
+    # not the pixel centre: adding 0.5 gave a 0.34 degree heading bias (found in the sweep)
+    u, v = np.meshgrid(np.arange(C.IMG_W), np.arange(C.IMG_H))
     x = depth
     y = -(u - C.IMG_W / 2) / f * depth  # column right of centre means robot-right, so negative y
     z = C.CAMERA_HEIGHT - (v - C.IMG_H / 2) / f * depth  # row below centre means lower
