@@ -89,6 +89,17 @@ If code disagrees with this file, update this file deliberately.
 - No pair collided (0 of 50 at either drift level). Mean final lateral error at 1% drift ranged from 2.4 mm (K_LAT 4) to 37 mm (K_LAT 0.25, K_HEAD 0.5). Higher K_LAT was better; K_HEAD mattered little at high K_LAT.
 - Chosen: **K_LAT = 2.0, K_HEAD = 2.0** (4.7 mm mean final error and 6.4 mm mean worst offset at 1% drift). Not the best row: K_LAT = 4 is at the edge of the grid, and the grid had no depth noise, which favours aggressive gains.
 - Seeds 1050 to 1099 were not used and remain available for later checks. Reported seeds 0 to 29 were never used for tuning.
+- Definition-of-Done check (`python src\sprint3_check.py`), all 100 tuning seeds, `d_eps` = 1%, default wheel noise:
+
+| mode | sigma_d (m) | collisions | successes | mean final lateral error (m) | mean worst offset (m) |
+|---|---|---|---|---|---|
+| B1 | 0 | 100 / 100 | 0 | 0.595 (at the crash) | 0.595 |
+| B2 | 0 | 0 | 99 | 0.124 | 0.124 |
+| C_both | 0 | 0 | 100 | 0.0047 | 0.0064 |
+| C_both | 0.05 | 0 | 100 | 0.0049 | 0.0065 |
+
+- B1's error is the offset at the moment of collision, so compare collisions, not that number.
+- The confidence fallback never triggered in these runs (`fit_fail_frac` 0.0). It is covered only by a forced-threshold test; a real test needs the doorway scenario (Sprint 5).
 
 ## 6. Sanity check and why the sweep values were chosen
 
