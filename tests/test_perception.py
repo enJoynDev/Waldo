@@ -130,3 +130,17 @@ def test_estimate_pose_on_rendered_pose_grid(world):
             assert est["ok"]
             assert abs(est["offset"] - y) < 0.05
             assert abs(est["heading"] - heading) < np.radians(2.0)
+
+
+def test_estimate_pose_fails_when_nothing_is_visible():
+    depth = np.full((C.IMG_H, C.IMG_W), C.FAR)  # every ray at the far clip means nothing hit
+    est = P.estimate_pose(depth, np.random.default_rng(0))
+    assert not est["ok"]
+    assert est["confidence"] == 0.0
+
+
+def test_estimate_pose_same_seed_same_result(world):
+    depth = W.render_depth(0.0, 0.2, np.radians(3.0))
+    est1 = P.estimate_pose(depth, np.random.default_rng(5))
+    est2 = P.estimate_pose(depth, np.random.default_rng(5))
+    assert est1 == est2
