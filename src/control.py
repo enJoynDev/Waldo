@@ -5,7 +5,7 @@ import numpy as np
 import config as C
 
 # which terms each mode uses: (lateral, heading)
-_TERMS = {"C_lat": (1.0, 0.0), "C_head": (0.0, 1.0), "C_both": (1.0, 1.0)}
+_TERMS = {"B2": (0.0, 1.0), "C_lat": (1.0, 0.0), "C_head": (0.0, 1.0), "C_both": (1.0, 1.0)}
 
 
 def correction(mode, offset, heading):

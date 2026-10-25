@@ -45,6 +45,6 @@ def test_trial_after_a_collision_starts_clean(world):
     assert r["collided"] is False and r["success"] is True
 
 
-def test_modes_not_built_yet_are_refused(world):
-    with pytest.raises(NotImplementedError):
-        R.run_trial(world, "C_both", 0, D.make_params())
+def test_unknown_mode_is_refused(world):
+    with pytest.raises(ValueError):
+        R.run_trial(world, "B3", 0, D.make_params())
