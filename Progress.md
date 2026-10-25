@@ -11,8 +11,8 @@ Rule: a sprint entry is written, and GitHub is updated (commit + push + PR merge
 |---|---|---|---|---|---|
 | 0 | Foundations | Done | 2026-10-05 | 2026-10-20 | none |
 | 1 | World, drift model, metrics | Done | 2026-10-20 | 2026-10-25 | `v0.1.0` |
-| 2 | Perception | Not started | | | `v0.2.0` |
-| 3 | Controller and closed loop | Not started | | | `v0.3.0` |
+| 2 | Perception | Done | 2026-10-25 | 2026-10-25 | `v0.2.0` |
+| 3 | Controller and closed loop | Done | 2026-10-25 | 2026-10-25 | `v0.3.0` |
 | 4 | Experiments | Not started | | | `v0.4.0` |
 | 5 | Analysis and stress tests | Not started | | | `v0.5.0` |
 | 6 | Write-up and release | Not started | | | `v1.0.0` |
@@ -21,8 +21,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 ## 2. Current focus
 
-- Sprint 1: world, drift model, metrics, analytic check.
-- Next concrete action: create branch `sprint-1-world-drift` and start with issue #1 (`config.py`).
+- Sprint 4: experiments (`run_experiments.py`, the main sweep, the depth-noise sweep and the plots).
+- Next concrete action: create branch `sprint-4-experiments` and open the Sprint 4 issues.
 
 ## 3. Decisions log
 
@@ -156,6 +156,31 @@ Targets (offset under 0.05 m, heading under 2 degrees at zero noise) met by a wi
 - Half-pixel back-projection bug found by the sweep: constant 0.34 degree heading bias, fixed.
 
 **Honesty notes:** errors are small because per-pixel Gaussian noise averages out over thousands of points; real depth errors are correlated and biased. The renderer's own depth error grows with distance (about 1 cm under 2 m, 5 cm at 8–10 m).
+
+### Sprint 3: Controller and closed loop (2026-10-25) — Done
+
+**Delivered:** `control.py`, all five modes in `run_trial.py`, `tune_gains.py`, `sprint3_check.py`, closed-loop tests (issues #16–#20). All tests passing.
+
+**Results** (100 tuning seeds, `d_eps` = 1%)
+
+| mode | sigma_d (m) | collisions | successes | mean final lateral error (m) |
+|---|---|---|---|---|
+| B1 | 0 | 100 / 100 | 0 | 0.595 (at the crash) |
+| B2 | 0 | 0 | 99 | 0.124 |
+| C_both | 0 | 0 | 100 | 0.0047 |
+| C_both | 0.05 | 0 | 100 | 0.0049 |
+
+Gain grid: 25 pairs x 50 seeds x 2 drift levels, 21 minutes with a process pool; no collisions anywhere. Camera-mode trial about 3.5 s; B1 and B2 trials about 0.1 s.
+
+**Decisions**
+- Gains K_LAT = 2.0, K_HEAD = 2.0: not the best row (K_LAT = 4 is at the grid edge and the grid had no depth noise); checked afterwards at sigma_d = 0.05 with no loss.
+- B2 holds the simulated gyro heading using the same heading gain.
+- The camera renders from the TRUE pose (it sits on the real robot); the controller never reads TRUE pose directly.
+- RANSAC uses its own random stream (4th child of the seed), so the drift noise is unchanged.
+- Low confidence: hold the last correction for 3 frames, then zero.
+- `run_trial` refuses unknown modes (ValueError).
+
+**Honesty notes:** the confidence fallback never fired in these runs, so it is only tested with a forced threshold; gains were tuned on 50 of the 100 tuning seeds; walls are clean and drift is injected, so the gap over B2 is likely larger than it would be on a real robot.
 
 <!-- Template for each new sprint entry:
 

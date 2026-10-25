@@ -83,24 +83,24 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   
 ### Sprint 2: Perception (status: done 2026-10-25, started 2026-10-25; tag v0.2.0)
 - Tasks:
-  - `perception.py`: depth to 3D points, drop floor/ceiling by height, project to ground plane.
-  - Own numpy RANSAC line fit per wall (walls run along the forward axis, so `y = a*x + b` is well-conditioned).
-  - Outputs: lateral offset, heading error, confidence.
-  - Offline test on rendered frames from a grid of known poses.
-  - Degradation curve vs depth noise.
-  - Choose the confidence threshold from the tuning seeds and record it in `docs/EXPERIMENTS.md`.
+  - [x] `perception.py`: depth to 3D points, drop floor/ceiling by height, project to ground plane.
+  - [x] Own numpy RANSAC line fit per wall (walls run along the forward axis, so `y = a*x + b` is well-conditioned).
+  - [x] Outputs: lateral offset, heading error, confidence.
+  - [x] Offline test on rendered frames from a grid of known poses.
+  - [x] Degradation curve vs depth noise.
+  - [x] Choose the confidence threshold from the tuning seeds and record it in `docs/EXPERIMENTS.md`.
 
 - Targets (our choice, state in report): offset error under 0.05 m and heading error under 2 degrees at zero depth noise.
 - Camera is at 0.4 m height with no tilt (our choice); readings under 0.52 m are discarded (D455 minimum depth).
-- DoD: targets met on the pose grid; tests pass; `ruff check` clean; degradation curve saved; confidence threshold recorded.
+- DoD: [x] targets met on the pose grid; tests pass; `ruff check` clean; degradation curve saved; confidence threshold recorded.
   
 
-### Sprint 3: Controller and closed loop
+### Sprint 3: Controller and closed loop (status: done 2026-10-25, started 2026-10-25; tag v0.3.0)
 - Tasks:
-  - `control.py`: PD correction on lateral offset and heading, output clipping, low-confidence fallback to odometry.
-  - Extend `run_trial.py` to all modes (`B1`, `B2`, `C_lat`, `C_head`, `C_both`).
-  - Tune gains on seeds 1000 to 1099 only.
-- DoD: `C_both` beats `B1` on final absolute lateral error at `d_eps = 1%` on tuning seeds; no visible oscillation in the trajectory plot; no wall collision at 1%.
+  - [x] `control.py`: PD correction on lateral offset and heading, output clipping, low-confidence fallback to odometry.
+  - [x] Extend `run_trial.py` to all modes (`B1`, `B2`, `C_lat`, `C_head`, `C_both`).
+  - [x] Tune gains on tuning seeds only (the grid used 1000 to 1049; 1050 to 1099 left unused)
+- DoD: [x] `C_both` beats `B1` on final absolute lateral error at `d_eps = 1%` on tuning seeds; no visible oscillation in the trajectory plot; no wall collision at 1%.
 
 ### Sprint 4: Experiments
 - Tasks:
