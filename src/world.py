@@ -17,9 +17,10 @@ def _box(center, half, visible=True):
     return p.createMultiBody(0, col, vis, basePosition=center)
 
 
-def create_world():
-    """Connect headless, build a closed corridor and the robot body. Returns a dict of body ids."""
-    p.connect(p.DIRECT)  # one client per process; each sweep worker calls this itself
+def create_world(gui=False):
+    """Connect, build a closed corridor and the robot body. Returns a dict of body ids."""
+    # DIRECT (headless) for all experiments; GUI only from debug scripts. One client per process.
+    p.connect(p.GUI if gui else p.DIRECT)
     cx = (C.CORRIDOR_X_MIN + C.CORRIDOR_X_MAX) / 2
     hx = (C.CORRIDOR_X_MAX - C.CORRIDOR_X_MIN) / 2
     hw, ht = C.CORRIDOR_WIDTH / 2, C.WALL_THICKNESS / 2
@@ -29,11 +30,11 @@ def create_world():
     right = _box([cx, -side, hh], [hx, ht, hh])
     # floor and ceiling: PyBullet returns NaN depth for rays that hit nothing
     _box([cx, 0, -ht], [hx, side, ht])
-    _box([cx, 0, C.WALL_HEIGHT + ht], [hx, side, ht])
+    ceiling = _box([cx, 0, C.WALL_HEIGHT + ht], [hx, side, ht])
     # no visual shape, so the robot never shows up in its own depth image
     half = [C.ROBOT_LENGTH / 2, C.ROBOT_WIDTH / 2, C.ROBOT_HEIGHT / 2]
     robot = _box([0, 0, C.ROBOT_HEIGHT / 2], half, visible=False)
-    return {"robot": robot, "walls": (left, right)}
+    return {"robot": robot, "walls": (left, right), "ceiling": ceiling}
 
 
 def close_world():

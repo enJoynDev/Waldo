@@ -15,8 +15,11 @@ def _command(mode, state):
     raise NotImplementedError(f"mode {mode} arrives in a later sprint")
 
 
-def run_trial(world, mode, seed, params, sigma_d=C.SIGMA_D_DEFAULT):
-    """Run one trial in an existing world. Returns one row of results."""
+def run_trial(world, mode, seed, params, sigma_d=C.SIGMA_D_DEFAULT, on_step=None):
+    """Run one trial in an existing world. Returns one row of results.
+
+    on_step(state) is an optional hook called after every step (used by the GUI debug script).
+    """
     t0 = time.perf_counter()
     state, noise = D.new_state(), D.make_noise(seed)
     W.set_robot_pose(world, C.START_X, C.START_Y, C.START_HEADING)  # undo the previous trial
@@ -28,6 +31,8 @@ def run_trial(world, mode, seed, params, sigma_d=C.SIGMA_D_DEFAULT):
         true = state["true"]
         W.set_robot_pose(world, true["x"], true["y"], true["th"])
         max_abs_y = max(max_abs_y, abs(true["y"]))
+        if on_step:
+            on_step(state)
         if W.in_collision(world):
             collided = True
             break
