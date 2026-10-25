@@ -13,7 +13,7 @@ Rule: a sprint entry is written, and GitHub is updated (commit + push + PR merge
 | 1 | World, drift model, metrics | Done | 2026-10-20 | 2026-10-25 | `v0.1.0` |
 | 2 | Perception | Done | 2026-10-25 | 2026-10-25 | `v0.2.0` |
 | 3 | Controller and closed loop | Done | 2026-10-25 | 2026-10-25 | `v0.3.0` |
-| 4 | Experiments | Not started | | | `v0.4.0` |
+| 4 | Experiments | Done | 2026-10-25 | 2026-10-25 | `v0.4.0` |
 | 5 | Analysis and stress tests | Not started | | | `v0.5.0` |
 | 6 | Write-up and release | Not started | | | `v1.0.0` |
 
@@ -21,8 +21,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 ## 2. Current focus
 
-- Sprint 4: experiments (`run_experiments.py`, the main sweep, the depth-noise sweep and the plots).
-- Next concrete action: create branch `sprint-4-experiments` and open the Sprint 4 issues.
+- Sprint 5: analysis and stress tests (skid and gyro-bias sweeps, paired statistics, optional doorway test).
+- Next concrete action: create branch `sprint-5-analysis` and open the Sprint 5 issues.
 
 ## 3. Decisions log
 
@@ -181,6 +181,34 @@ Gain grid: 25 pairs x 50 seeds x 2 drift levels, 21 minutes with a process pool;
 - `run_trial` refuses unknown modes (ValueError).
 
 **Honesty notes:** the confidence fallback never fired in these runs, so it is only tested with a forced threshold; gains were tuned on 50 of the 100 tuning seeds; walls are clean and drift is injected, so the gap over B2 is likely larger than it would be on a real robot.
+
+### Sprint 4: Experiments (2026-10-25) — Done
+
+**Delivered:** `run_experiments.py` (parallel runner), `plot_results.py` (figures 1 to 5 and the summary table), tests (issues #23–#27). Full sweep: 810 rows in about 260 s (4.3 min). A rerun from scratch gave identical results (only `runtime_s` differs).
+
+**Results** (reported seeds 0 to 29, 30 trials per cell; mean final |lateral error| in m, successes out of 30)
+
+| d_eps | B1 | B2 | C_lat | C_head | C_both |
+|---|---|---|---|---|---|
+| 0 | 0.0895 (22) | 0.1685 (0) | 0.0079 (30) | 0.0038 (30) | 0.0009 (30) |
+| 0.25% | 0.2393 (7) | 0.1577 (5) | 0.0078 (30) | 0.0112 (30) | 0.0012 (30) |
+| 0.5% | 0.4587 (0, 4 collisions) | 0.1470 (21) | 0.0078 (30) | 0.0223 (30) | 0.0021 (30) |
+| 1% | 0.5954 (0, 30 collisions) | 0.1263 (30) | 0.0079 (30) | 0.0447 (30) | 0.0043 (30) |
+| 2% | 0.5715 (0, 30 collisions) | 0.0866 (30) | 0.0110 (30) | 0.0909 (30) | 0.0090 (30) |
+
+Depth noise at 1% drift, `C_both`: 0.0043 m at sigma_d = 0, 0.0044 m at 0.02 and 0.0044 m at 0.05. No collisions in any B2 or camera-mode trial.
+
+**Decisions**
+- Depth-noise sweep covers `C_both` only; the sigma_d = 0 case is taken from the main sweep (no duplicate rows).
+- `run_id` is the position in the sorted condition list, so the file does not depend on worker order.
+- Log scale on the lateral-error figures: the baselines are tens of centimetres and the camera modes millimetres.
+
+**Findings to carry forward**
+- `C_both` beat every other mode at every drift level; `C_lat` is flat at about 8 mm, `C_head` grows with drift (9 cm at 2%, a small residual heading drifts the robot sideways), so both terms are needed.
+- `B2` fails every trial at zero drift (0.169 m) and gets better as drift grows. Cause: the injected gyro bias (+0.1 deg/s) alone gives about 0.17 m by 10 m, and positive wheel drift pushes the robot the other way, so the two partly cancel. This depends on the sign of the bias; Sprint 5 runs both signs.
+- The confidence fallback never fired (`fit_fail_frac` is 0.0 everywhere), even at sigma_d = 0.05.
+
+**Honesty notes:** the B2 result above is an artefact of the bias sign, not a general property of gyro-aided odometry; clean simulated walls and injected drift favour the camera modes; no statistical test has been run yet (Sprint 5).
 
 <!-- Template for each new sprint entry:
 

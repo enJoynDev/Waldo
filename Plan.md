@@ -102,18 +102,18 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   - [x] Tune gains on tuning seeds only (the grid used 1000 to 1049; 1050 to 1099 left unused)
 - DoD: [x] `C_both` beats `B1` on final absolute lateral error at `d_eps = 1%` on tuning seeds; no visible oscillation in the trajectory plot; no wall collision at 1%.
 
-### Sprint 4: Experiments
+### Sprint 4: Experiments (status: done 2026-10-25, started 2026-10-25; tag v0.4.0)
 - Tasks:
-  - `run_experiments.py` with spawn-safe multiprocessing, writing `results\raw.csv`.
-  - Main sweep: modes x `d_eps` x 30 seeds (0 to 29).
-  - Depth-noise sweep at a fixed drift level.
-  - Ablation is covered by the modes `C_lat`, `C_head`, `C_both`.
-  - `plot_results.py`: all figures listed in `docs/EXPERIMENTS.md`.
-- DoD: two commands regenerate `raw.csv` and all figures; row counts match the experiment spec; total runtime recorded in `Progress.md`.
+  - [x] `run_experiments.py` with spawn-safe multiprocessing, writing `results\raw.csv`.
+  - [x] Main sweep: modes x `d_eps` x 30 seeds (0 to 29).
+  - [x] Depth-noise sweep at a fixed drift level.
+  - [x] Ablation is covered by the modes `C_lat`, `C_head`, `C_both`.
+  - [x] `plot_results.py`: all figures listed in `docs/EXPERIMENTS.md`.
+- DoD: [x] two commands regenerate `raw.csv` and all figures; row counts match the experiment spec; total runtime recorded in `Progress.md`.
 
 ### Sprint 5: Analysis and stress tests
 - Tasks:
-  - Lateral-skid sweep; gyro-bias sweep for `B2`.
+  - Lateral-skid sweep; gyro-bias sweep for `B2`, with the bias in both directions (positive and negative).
   - Optional: side-opening (doorway) test of the confidence gate.
   - Paired statistics, confidence intervals, collision-rate intervals.
   - Draft threats-to-validity list from what actually broke.
