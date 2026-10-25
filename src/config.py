@@ -54,6 +54,8 @@ FAR = 10.0
 CAMERA_HEIGHT = 0.4  # our choice, not given in the paper
 CAMERA_MIN_DEPTH = 0.52  # D455 minimum depth; perception discards closer readings
 CAMERA_MAX_DEPTH = 9.9  # readings at the far clip (just under FAR) mean "nothing hit"; discard
+WALL_Z_MIN = 0.15  # perception keeps points between these heights: drops floor and ceiling
+WALL_Z_MAX = 0.85  # (our choice; margins cover the renderer's depth error)
 
 # --- injected drift (defaults; applied to the TRUE pose only) ---
 D_EPS_DEFAULT = 0.0  # wheel-scale mismatch eps_R - eps_L, split symmetrically

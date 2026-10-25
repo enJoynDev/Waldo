@@ -40,3 +40,25 @@ def test_side_walls_land_at_plus_and_minus_one_metre(world):
     assert len(left) > 100 and len(right) > 100
     assert np.abs(left[:, 1] - C.CORRIDOR_WIDTH / 2).max() < 0.03
     assert np.abs(right[:, 1] + C.CORRIDOR_WIDTH / 2).max() < 0.03
+
+
+def test_wall_points_drop_floor_and_ceiling_and_z():
+    pts = np.array(
+        [
+            [2.0, 1.0, 0.5],  # wall
+            [2.0, 0.0, 0.0],  # floor
+            [2.0, 0.0, 1.0],  # ceiling
+            [3.0, -1.0, 0.4],  # wall
+        ]
+    )
+    out = P.wall_points_2d(pts)
+    assert out.shape == (2, 2)
+    assert np.allclose(out, [[2.0, 1.0], [3.0, -1.0]])
+
+
+def test_only_side_wall_points_remain_in_empty_corridor(world):
+    pts = P.depth_to_points(W.render_depth(0.0, 0.0, 0.0))
+    xy = P.wall_points_2d(pts)
+    assert len(xy) > 1000
+    # floor and ceiling points would have |y| well below 1 m
+    assert np.abs(xy[:, 1]).min() > 0.9

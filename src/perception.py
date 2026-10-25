@@ -22,3 +22,9 @@ def depth_to_points(depth):
     z = C.CAMERA_HEIGHT - (v - C.IMG_H / 2) / f * depth  # row below centre means lower
     keep = np.isfinite(depth) & (depth >= C.CAMERA_MIN_DEPTH) & (depth < C.CAMERA_MAX_DEPTH)
     return np.stack([x[keep], y[keep], z[keep]], axis=1)
+
+
+def wall_points_2d(points):
+    """Keep only wall-height points and drop z: top-down (x, y) points, shape (N, 2)."""
+    keep = (points[:, 2] > C.WALL_Z_MIN) & (points[:, 2] < C.WALL_Z_MAX)
+    return points[keep][:, :2]
