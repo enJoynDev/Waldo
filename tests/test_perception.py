@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 import config as C
 import perception as P
@@ -88,3 +89,44 @@ def test_ransac_same_seed_same_result():
 
 def test_ransac_returns_none_with_too_few_points():
     assert P.ransac_line(_line_with_outliers()[:5], np.random.default_rng(1)) is None
+
+
+def _wall_points(py, heading, n=200, seed=0):
+    # points on the walls y = +1 and y = -1 seen from a robot at lateral position py
+    rng = np.random.default_rng(seed)
+    X = rng.uniform(1.0, 8.0, n)
+    pts = []
+    for wall_y in (1.0, -1.0):
+        dx, dy = X - 0.0, wall_y - py
+        c, s = np.cos(heading), np.sin(heading)
+        pts.append(np.column_stack([dx * c + dy * s, -dx * s + dy * c]))
+    return np.vstack(pts)
+
+
+@pytest.mark.parametrize("py", [-0.4, 0.0, 0.3])
+@pytest.mark.parametrize("heading_deg", [-8.0, 0.0, 5.0])
+def test_estimate_from_points_recovers_known_pose(py, heading_deg):
+    heading = np.radians(heading_deg)
+    est = P.estimate_from_points(_wall_points(py, heading), np.random.default_rng(1))
+    assert est["ok"]
+    assert abs(est["offset"] - py) < 0.01
+    assert abs(est["heading"] - heading) < np.radians(0.5)
+    assert est["confidence"] > 0.9
+
+
+def test_estimate_fails_with_only_one_wall():
+    pts = _wall_points(0.0, 0.0)
+    est = P.estimate_from_points(pts[pts[:, 1] > 0], np.random.default_rng(1))
+    assert not est["ok"]
+    assert est["confidence"] == 0.0
+
+
+def test_estimate_pose_on_rendered_pose_grid(world):
+    rng = np.random.default_rng(0)
+    for y in (-0.4, 0.0, 0.3):
+        for heading_deg in (-8.0, 0.0, 5.0):
+            heading = np.radians(heading_deg)
+            est = P.estimate_pose(W.render_depth(0.0, y, heading), rng)
+            assert est["ok"]
+            assert abs(est["offset"] - y) < 0.05
+            assert abs(est["heading"] - heading) < np.radians(2.0)

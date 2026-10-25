@@ -56,3 +56,38 @@ def ransac_line(xy, rng):
     mask = inliers[best]
     a, b = np.polyfit(x[mask], y[mask], 1)
     return float(a), float(b), int(mask.sum())
+
+
+def estimate_from_points(xy, rng):
+    """Offset, heading error and confidence from top-down wall points.
+
+    Sign convention matches TRUE pose: offset is the robot's y (left positive) relative to
+    the corridor centre, heading is its angle (left positive) relative to the corridor axis.
+    The walls are found by sequential RANSAC (strongest line, remove its inliers, fit again)
+    rather than by the sign of y, because a turned robot sees a near wall cross y = 0.
+    The line with the larger intercept is the left wall.
+    On failure (second wall missing) returns NaN offset/heading, confidence 0, ok False.
+    """
+    fail = {"offset": float("nan"), "heading": float("nan"), "confidence": 0.0, "ok": False}
+    first = ransac_line(xy, rng)
+    if first is None:
+        return fail
+    a1, b1, _ = first
+    on_first = np.abs(xy[:, 1] - (a1 * xy[:, 0] + b1)) < C.RANSAC_THRESHOLD
+    second = ransac_line(xy[~on_first], rng)
+    if second is None:
+        return fail
+    a2, b2, n2 = second
+    (a_l, b_l), (a_r, b_r) = sorted([(a1, b1), (a2, b2)], key=lambda f: -f[1])
+    heading = -math.atan((a_l + a_r) / 2)
+    cos_h = math.cos(heading)
+    offset = -(b_l + b_r) * cos_h / 2
+    width = (b_l - b_r) * cos_h
+    inlier_frac = (on_first.sum() + n2) / len(xy)  # share of wall points the two lines explain
+    width_ok = max(0.0, 1.0 - abs(width - C.CORRIDOR_WIDTH) / C.CONF_WIDTH_TOL)
+    return {"offset": offset, "heading": heading, "confidence": inlier_frac * width_ok, "ok": True}
+
+
+def estimate_pose(depth, rng):
+    """Full perception pipeline: depth image to offset, heading error and confidence."""
+    return estimate_from_points(wall_points_2d(depth_to_points(depth)), rng)
