@@ -81,7 +81,7 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   - [x] Same seed gives identical results on two runs.
   - [x] Same seed gives the same noise sequence across modes (paired comparison).
   
-### Sprint 2: Perception
+### Sprint 2: Perception (status: done 2026-10-25, started 2026-10-25; tag v0.2.0)
 - Tasks:
   - `perception.py`: depth to 3D points, drop floor/ceiling by height, project to ground plane.
   - Own numpy RANSAC line fit per wall (walls run along the forward axis, so `y = a*x + b` is well-conditioned).
