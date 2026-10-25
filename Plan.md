@@ -54,32 +54,33 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   - [x] Write the proposal (markdown and Word versions)
   - [x] Create the five working docs (this set)
   - [x] Choose the final project name
-  - [ ] Create the GitHub repo; add `.gitignore` and `.gitattributes`; first commit on `main`
-  - [ ] Create the conda env from `environment.yml`; select the interpreter in VS Code
-  - [ ] Run `src\smoke_test.py` (headless depth render works)
-  - [ ] Time one depth render to budget total sweep runtime
-  - [ ] Verify assumed parameters: wheel base `b`, camera FOV, camera height, Husky footprint
+  - [x] Create the GitHub repo; add `.gitignore` and `.gitattributes`; first commit on `main`
+  - [x] Create the conda env from `environment.yml`; select the interpreter in VS Code
+  - [x] Run `src\smoke_test.py` (headless depth render works)
+  - [x] Time one depth render to budget total sweep runtime
+  - [x] Verify assumed parameters: wheel base `b`, camera FOV, camera height, Husky footprint
   - [ ] Novelty check: run the searches listed in `docs/REFERENCES.md`; write positioning notes
        - Deferred on 2026-10-20 by choice. Must be done before Sprint 6 (the report) and before any prior-work claim is written.
-  - [ ] Add `ruff` config; confirm `ruff check` and `ruff format` run
-  - [ ] Open GitHub Issues for Sprint 1 tasks
-- DoD: smoke test prints a depth image shape and plausible metric range; repo is on GitHub; novelty notes are written; `Progress.md` has the Sprint 0 entry.
+  - [x] Add `ruff` config; confirm `ruff check` and `ruff format` run
+  - [x] Open GitHub Issues for Sprint 1 tasks
+- DoD: smoke test prints a depth image shape and plausible metric range; repo is on GitHub; `Progress.md` has the Sprint 0 entry. (Novelty notes carried forward, see deferral above.)
 
-### Sprint 1: World, drift model, metrics
+### Sprint 1: World, drift model, metrics (status: done 2026-10-25, started 2026-10-20; tag v0.1.0)
 - Tasks:
-  - `config.py`: every constant in one place.
-  - `world.py`: corridor from box walls, robot body, depth render, depth-buffer to metric conversion.
-  - `drift.py`: TRUE pose vs ODOM pose, wheel-scale mismatch, lateral skid, noise, simulated gyro (for `B2`).
-  - `metrics.py`: lateral error, heading error, collision, the paper's drift metric, success.
-  - `run_trial.py` for `B1` only (no correction yet).
-  - Tests: depth conversion, analytic drift check, determinism.
-  - Watch one trial in `p.GUI`.
+  - [x] `config.py`: every constant in one place.
+  - [x] `world.py`: corridor from box walls, robot body, depth render, depth-buffer to metric conversion.
+  - [x] `drift.py`: TRUE pose vs ODOM pose, wheel-scale mismatch, lateral skid, noise, simulated gyro (for `B2`).
+  - [x] `metrics.py`: lateral error, heading error, collision, the paper's drift metric, success.
+  - [x] `run_trial.py` for `B1` only (no correction yet).
+  - [x] Tests: depth conversion, analytic drift check, determinism.
+  - [x] Watch one trial in `p.GUI`.
+  - [x] `debug_gui.py`: GUI view of TRUE vs ODOM path, via the `on_step` hook in `run_trial.py`.
 - Why `B2`'s gyro model is built now: adding it later means re-running everything. Building it here lets Sprint 4 run all modes in one sweep. (This differs from `docs/PLAN.md`, which put `B2` late; this file supersedes it.)
 - DoD:
-  - `B1` lateral error matches `L^2 * d_eps / (2b)` within a few percent at small `d_eps`, no noise.
-  - Same seed gives identical results on two runs.
-  - Same seed gives the same noise sequence across modes (paired comparison).
-
+  - [x] `B1` lateral error matches `L^2 * d_eps / (2b)` within a few percent at small `d_eps`, no noise.
+  - [x] Same seed gives identical results on two runs.
+  - [x] Same seed gives the same noise sequence across modes (paired comparison).
+  
 ### Sprint 2: Perception
 - Tasks:
   - `perception.py`: depth to 3D points, drop floor/ceiling by height, project to ground plane.
@@ -87,8 +88,12 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   - Outputs: lateral offset, heading error, confidence.
   - Offline test on rendered frames from a grid of known poses.
   - Degradation curve vs depth noise.
+  - Choose the confidence threshold from the tuning seeds and record it in `docs/EXPERIMENTS.md`.
+
 - Targets (our choice, state in report): offset error under 0.05 m and heading error under 2 degrees at zero depth noise.
-- DoD: targets met on the pose grid; tests pass; degradation curve saved.
+- Camera is at 0.4 m height with no tilt (our choice); readings under 0.52 m are discarded (D455 minimum depth).
+- DoD: targets met on the pose grid; tests pass; `ruff check` clean; degradation curve saved; confidence threshold recorded.
+  
 
 ### Sprint 3: Controller and closed loop
 - Tasks:
