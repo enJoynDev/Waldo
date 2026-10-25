@@ -22,6 +22,10 @@ CORRIDOR_X_MIN = -1.0
 CORRIDOR_X_MAX = 12.0
 WALL_HEIGHT = 1.0
 WALL_THICKNESS = 0.1
+# doorway test (Sprint 5): gap in one wall with an alcove behind it
+DOORWAY_X0 = 4.0  # m, start of the gap
+DOORWAY_X1 = 5.5  # m, end of the gap
+ALCOVE_DEPTH = 1.0  # m, how far the alcove extends past the wall
 
 # --- robot (Husky A200 footprint from the source paper) ---
 ROBOT_LENGTH = 0.99

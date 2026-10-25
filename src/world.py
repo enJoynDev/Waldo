@@ -17,8 +17,12 @@ def _box(center, half, visible=True):
     return p.createMultiBody(0, col, vis, basePosition=center)
 
 
-def create_world(gui=False):
-    """Connect, build a closed corridor and the robot body. Returns a dict of body ids."""
+def create_world(gui=False, doorway=None):
+    """Connect, build a closed corridor and the robot body. Returns a dict of body ids.
+
+    doorway: None for the normal corridor, +1 or -1 to cut a gap (with an alcove behind it)
+    in the left or right wall. Only the doorway test uses it.
+    """
     # DIRECT (headless) for all experiments; GUI only from debug scripts. One client per process.
     p.connect(p.GUI if gui else p.DIRECT)
     cx = (C.CORRIDOR_X_MIN + C.CORRIDOR_X_MAX) / 2
@@ -26,15 +30,32 @@ def create_world(gui=False):
     hw, ht = C.CORRIDOR_WIDTH / 2, C.WALL_THICKNESS / 2
     hh = C.WALL_HEIGHT / 2
     side = hw + ht
-    left = _box([cx, side, hh], [hx, ht, hh])
-    right = _box([cx, -side, hh], [hx, ht, hh])
+    # a wider floor and ceiling under the alcove keep depth finite (no NaN rays) through the gap
+    extra = (3 * ht + C.ALCOVE_DEPTH) if doorway else 0.0
+
+    def wall(sign):
+        if sign != doorway:
+            return [_box([cx, sign * side, hh], [hx, ht, hh])]
+        x0, x1 = C.DOORWAY_X0, C.DOORWAY_X1
+        xmin, xmax = C.CORRIDOR_X_MIN, C.CORRIDOR_X_MAX
+        d = C.ALCOVE_DEPTH
+        y_in = sign * (side + ht)  # outer face of the wall
+        return [
+            _box([(xmin + x0) / 2, sign * side, hh], [(x0 - xmin) / 2, ht, hh]),
+            _box([(x1 + xmax) / 2, sign * side, hh], [(xmax - x1) / 2, ht, hh]),
+            _box([(x0 + x1) / 2, y_in + sign * (d + ht), hh], [(x1 - x0) / 2, ht, hh]),  # back
+            _box([x0, y_in + sign * d / 2, hh], [ht, d / 2, hh]),  # cap at gap start
+            _box([x1, y_in + sign * d / 2, hh], [ht, d / 2, hh]),  # cap at gap end
+        ]
+
+    walls = wall(1) + wall(-1)
     # floor and ceiling: PyBullet returns NaN depth for rays that hit nothing
-    _box([cx, 0, -ht], [hx, side, ht])
-    ceiling = _box([cx, 0, C.WALL_HEIGHT + ht], [hx, side, ht])
+    _box([cx, 0, -ht], [hx, side + extra, ht])
+    ceiling = _box([cx, 0, C.WALL_HEIGHT + ht], [hx, side + extra, ht])
     # no visual shape, so the robot never shows up in its own depth image
     half = [C.ROBOT_LENGTH / 2, C.ROBOT_WIDTH / 2, C.ROBOT_HEIGHT / 2]
     robot = _box([0, 0, C.ROBOT_HEIGHT / 2], half, visible=False)
-    return {"robot": robot, "walls": (left, right), "ceiling": ceiling}
+    return {"robot": robot, "walls": tuple(walls), "ceiling": ceiling}
 
 
 def close_world():
