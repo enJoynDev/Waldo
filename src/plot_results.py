@@ -115,9 +115,8 @@ def fig2_collision_rate(df, path):
             rates.append(k / n)
             lows.append(k / n - lo)
             highs.append(hi - k / n)
-        x = (
-            np.arange(len(levels)) + (i - 2) * 0.04
-        )  # small offset so overlapping lines stay visible
+            # small x offset per mode so overlapping lines stay visible
+        x = np.arange(len(levels)) + (i - 2) * 0.04
         ax.errorbar(
             x, rates, yerr=[lows, highs], color=color, marker=marker, lw=2, capsize=3, label=mode
         )
