@@ -59,13 +59,29 @@ If code disagrees with this file, update this file deliberately.
 
 - Depth image -> metric depth -> back-project to 3D points in camera frame.
 - Drop floor/ceiling points by height. Project remaining points to the ground plane (x forward, y left).
-- Split by sign of y into left-wall and right-wall candidates. Fit a line to each with RANSAC.
+- Find the two walls by sequential RANSAC: fit the strongest line `y = a*x + b`, remove its inliers, fit the second line to what remains. The line with the larger intercept is the left wall. (A split by the sign of y fails when a turned robot sees a near wall cross y = 0.)
 - From the two lines:
-  - heading error = average of the two line angles
-  - lateral offset = (distance to left wall - distance to right wall) / 2
-  - confidence = inlier ratio and agreement between the two wall angles (walls should be nearly parallel)
+  - heading error = `-atan((a_left + a_right) / 2)`, positive when the robot is turned left
+  - lateral offset = `-(b_left + b_right) * cos(heading) / 2`, positive when the robot is left of the centre
+  - confidence = share of wall points explained by the two lines, scaled to 0 if the estimated corridor width is off by 0.5 m or more; 0 if either wall fails to fit
 - Controller: `omega = omega_nominal + k_lat * lat_err + k_head * head_err`, with `omega` clipped.
-- If confidence is below threshold, hold the last correction briefly, then fall back to odometry-only. The threshold value is set in Sprint 2 from the perception tests and recorded here.
+- If confidence is below threshold, hold the last correction briefly, then fall back to odometry-only. The threshold is **0.5** (`CONF_THRESHOLD`). It is provisional: good frames on the tuning seeds never scored below 0.82, and no bad-frame scenario has been tested yet. Revisit in Sprint 5.
+
+### 5a. Perception parameters and Sprint 2 results
+
+- Keep points between 0.15 and 0.85 m height (floor and ceiling removal). Discard readings closer than 0.52 m or at the far clip (9.9 m and beyond).
+- RANSAC: 100 iterations, inlier distance 0.05 m (above the renderer's own ~3 cm wall scatter within 6 m), minimum 20 points.
+- Accuracy on a 5 x 5 pose grid (lateral -0.4 to 0.4 m, heading -8 to 8 degrees), 100 tuning seeds, 2500 estimates per noise level, no failed fits:
+
+| sigma_d (m) | offset median / p95 (m) | heading median / p95 (deg) | confidence median |
+|---|---|---|---|
+| 0 | 0.0000 / 0.0000 | 0.000 / 0.000 | 1.000 |
+| 0.02 | 0.0003 / 0.0008 | 0.006 / 0.016 | 0.995 |
+| 0.05 | 0.0020 / 0.0060 | 0.029 / 0.095 | 0.844 |
+
+- Caveat: these errors are very small because the noise is independent Gaussian per pixel and the fit averages thousands of points. Real depth errors are correlated and biased, so real accuracy would be worse.
+- A half-pixel offset in the back-projection gave a constant 0.34 degree heading bias until the sweep exposed it; fixed in `depth_to_points`.
+- Reproduce: `python src\perception_sweep.py` (about 70 s).
 
 ## 6. Sanity check and why the sweep values were chosen
 

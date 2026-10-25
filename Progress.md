@@ -133,6 +133,30 @@ Each decision: what, why, alternative rejected.
 - `success` is cast to `bool` in `metrics.py`.
 
 **Honesty notes:** drift is injected, not measured from hardware. Simulated depth is cleaner than real depth.
+
+### Sprint 2: Perception (2026-10-25) — Done
+
+**Delivered:** `perception.py` (depth to points, floor/ceiling removal, own NumPy RANSAC, wall estimator), `perception_sweep.py`, 23 perception tests (issues #10–#15). Full suite: 62 tests passing.
+
+**Results** (5 x 5 pose grid, 100 tuning seeds, 2500 estimates per level, no failed fits)
+
+| sigma_d (m) | offset median / p95 (m) | heading median / p95 (deg) | confidence median |
+|---|---|---|---|
+| 0 | 0.0000 / 0.0000 | 0.000 / 0.000 | 1.000 |
+| 0.02 | 0.0003 / 0.0008 | 0.006 / 0.016 | 0.995 |
+| 0.05 | 0.0020 / 0.0060 | 0.029 / 0.095 | 0.844 |
+
+Targets (offset under 0.05 m, heading under 2 degrees at zero noise) met by a wide margin. Sweep runtime about 70 s.
+
+**Decisions**
+- Walls found by sequential RANSAC, not by the sign of y (a turned robot sees the near wall cross y = 0).
+- Far-clip readings (9.9 m and beyond) discarded: the renderer returns just under FAR for "nothing hit".
+- RANSAC inlier distance 0.05 m, above the renderer's ~3 cm wall scatter within 6 m.
+- Confidence threshold 0.5, provisional; revisit in Sprint 5 with a doorway test.
+- Half-pixel back-projection bug found by the sweep: constant 0.34 degree heading bias, fixed.
+
+**Honesty notes:** errors are small because per-pixel Gaussian noise averages out over thousands of points; real depth errors are correlated and biased. The renderer's own depth error grows with distance (about 1 cm under 2 m, 5 cm at 8–10 m).
+
 <!-- Template for each new sprint entry:
 
 ### Sprint N: Name (status)
