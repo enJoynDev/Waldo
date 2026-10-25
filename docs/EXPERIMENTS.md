@@ -38,7 +38,7 @@ If code disagrees with this file, update this file deliberately.
   - `C_both`: depth correction using both. This is the main method.
 - Independent variables:
   - Drift severity `d_eps` in {0, 0.25%, 0.5%, 1%, 2%} (see section 6 for why these values).
-  - Depth noise `sigma_d` in {0, 0.02, 0.05} m (Gaussian on metric depth). Secondary sweep at fixed d_eps = 1%.
+  - Depth noise `sigma_d` in {0, 0.02, 0.05} m (Gaussian on metric depth). Secondary sweep: `C_both` only, at fixed d_eps = 1%, sigma_d in {0.02, 0.05}; the sigma_d = 0 case comes from the main sweep.
   - Optional: lateral skid `s_lat` in {0, 1%, 2%} at fixed `d_eps`.
 - Trials: **30 per condition** (RRT-style stochastic noise needs repeats; same logic applies here).
 - Seeds: 0 to 29 for reported results. **1000 to 1099 reserved for tuning gains.** Never tune on reported seeds.
@@ -127,6 +127,7 @@ If code disagrees with this file, update this file deliberately.
 
 - Columns: `run_id, seed, mode, d_eps, s_lat, sigma_w, sigma_d, final_lat_err, final_head_err_deg, max_lat_err, collided, dist_travelled, drift_paper, success, fit_fail_frac, runtime_s`
 - One row per trial. Regenerate, never edit by hand.
+- Expected size: 810 rows = 750 (5 modes x 5 drift levels x 30 seeds) + 60 (depth-noise sweep). Regenerate with `python src\run_experiments.py` (about 4.5 minutes), then `python src\plot_results.py`.
 
 ## 9. Statistics
 
@@ -158,3 +159,5 @@ If code disagrees with this file, update this file deliberately.
 - Controller gains were tuned in simulation.
 - Single straight corridor; results may not extend to turns or cluttered spaces.
 - The 0.15 m success threshold and `d_s = 0.2 m` are our choices.
+- `B2`'s results depend on the sign of the injected gyro bias: a positive bias pushes the robot right and partly cancels positive wheel drift, so `B2` looks better as drift grows. Sprint 5 runs the bias in both directions.
+- The confidence fallback never fired in any trial, so its behaviour on real failures (doorways, glare) is untested.

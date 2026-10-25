@@ -93,6 +93,7 @@ SIGMA_D_LEVELS = (0.0, 0.02, 0.05)
 S_LAT_LEVELS = (0.0, 0.01, 0.02)
 GYRO_BIAS_LEVELS_DEG_S = (0.0, 0.1, 0.5, 1.0)
 DEPTH_SWEEP_D_EPS = 0.01  # fixed drift level for the depth-noise sweep
+ABLATION_D_EPS = (0.01, 0.02)  # the two drift levels used for the ablation bars
 
 # --- seeds: tune on one set, report on the other, never mix ---
 SEEDS_REPORT = tuple(range(0, 30))
