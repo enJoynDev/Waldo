@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = ROOT / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
 RAW_CSV = RESULTS_DIR / "raw.csv"
+STRESS_CSV = RESULTS_DIR / "stress.csv"
 
 # --- corridor ---
 CORRIDOR_WIDTH = 2.0
@@ -91,7 +92,8 @@ GYRO_NOISE_DEG_S = 0.05
 D_EPS_LEVELS = (0.0, 0.0025, 0.005, 0.01, 0.02)
 SIGMA_D_LEVELS = (0.0, 0.02, 0.05)
 S_LAT_LEVELS = (0.0, 0.01, 0.02)
-GYRO_BIAS_LEVELS_DEG_S = (0.0, 0.1, 0.5, 1.0)
+GYRO_BIAS_SWEEP_DEG_S = (-1.0, -0.5, -0.1, 0.0, 0.1, 0.5, 1.0)  # B2 sweep, both signs
+STRESS_GYRO_D_EPS = (0.0025, 0.01)  # drift levels for the gyro-bias sweep
 DEPTH_SWEEP_D_EPS = 0.01  # fixed drift level for the depth-noise sweep
 ABLATION_D_EPS = (0.01, 0.02)  # the two drift levels used for the ablation bars
 

@@ -5,7 +5,7 @@ import drift as D
 import run_trial as R
 
 COLUMNS = {
-    "seed", "mode", "d_eps", "s_lat", "sigma_w", "sigma_d", "final_lat_err",
+    "seed", "mode", "d_eps", "s_lat", "sigma_w","gyro_bias_deg_s", "sigma_d", "final_lat_err",
     "final_head_err_deg", "max_lat_err", "collided", "dist_travelled", "drift_paper",
     "success", "fit_fail_frac", "runtime_s",
 }  # fmt: skip
