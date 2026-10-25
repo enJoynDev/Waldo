@@ -22,7 +22,7 @@ Status values: Not started, In progress, Blocked, Done.
 ## 2. Current focus
 
 - Sprint 6: write-up and release (README results, docs sync, tag `v1.0.0`).
-- Next concrete action: write the novelty notes in `docs/REFERENCES.md`, then create branch `sprint-6-writeup` and open the Sprint 6 issues.
+- Next concrete action: write the novelty notes in `docs/REFERENCES.md`, then create branch `sprint-6-release` and open the Sprint 6 issues.
 
 ## 3. Decisions log
 

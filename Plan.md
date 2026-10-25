@@ -111,13 +111,15 @@ Deeper detail: `docs/PROJECT_BRIEF.md` (rationale), `docs/EXPERIMENTS.md` (exper
   - [x] `plot_results.py`: all figures listed in `docs/EXPERIMENTS.md`.
 - DoD: [x] two commands regenerate `raw.csv` and all figures; row counts match the experiment spec; total runtime recorded in `Progress.md`.
 
-### Sprint 5: Analysis and stress tests
+### Sprint 5: Analysis and stress tests (status: done 2026-10-25, started 2026-10-25; tag v0.5.0)
 - Tasks:
-  - Lateral-skid sweep; gyro-bias sweep for `B2`, with the bias in both directions (positive and negative).
-  - Optional: side-opening (doorway) test of the confidence gate.
-  - Paired statistics, confidence intervals, collision-rate intervals.
-  - Draft threats-to-validity list from what actually broke.
-- DoD: conclusions are written against `B2`. If depth adds little over `B2`, that finding is stated plainly.
+  - [x] Generalise the runner (`stress` mode) so extra sweeps reuse the same machinery.
+  - [x] Lateral-skid sweep, with figure 6.
+  - [x] Gyro-bias sweep for `B2`, with figure 7.
+  - [x] Doorway test of the confidence gate (`doorway_test.py`): the gate fires, with no collisions.
+  - [x] Paired statistics (`analysis.py`, `results/stats.csv`): Wilcoxon signed-rank paired by seed, Bonferroni over 40 comparisons. Confidence and Wilson intervals are in `summary.csv`.
+  - [x] Threats-to-validity list rewritten from what actually broke (`docs/EXPERIMENTS.md`, section 12).
+- DoD: [x] conclusions are written against `B2`. Depth adds a lot over `B2` (8 to 10 times lower error even at zero gyro bias). Within the camera modes, the lateral term does most of the work, and `C_both` is not better than `C_lat` at high drift or under skid. Both are stated plainly.
 
 ### Sprint 6: Write-up and release
 - Tasks:
