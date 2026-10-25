@@ -10,7 +10,7 @@ Rule: a sprint entry is written, and GitHub is updated (commit + push + PR merge
 | Sprint | Name | Status | Start | End | Tag |
 |---|---|---|---|---|---|
 | 0 | Foundations | Done | 2026-10-05 | 2026-10-20 | none |
-| 1 | World, drift model, metrics | Not started | | | `v0.1.0` |
+| 1 | World, drift model, metrics | Done | 2026-10-20 | 2026-10-25 | `v0.1.0` |
 | 2 | Perception | Not started | | | `v0.2.0` |
 | 3 | Controller and closed loop | Not started | | | `v0.3.0` |
 | 4 | Experiments | Not started | | | `v0.4.0` |
@@ -103,6 +103,36 @@ Each decision: what, why, alternative rejected.
 - Remaining (carried forward): novelty notes in `docs/REFERENCES.md`. See the decision of 2026-10-20.
 - Branch: `sprint-0-foundations`.
 
+### Sprint 1: World + drift model (2026-10-20 to 2026-10-25) — Done
+
+**Delivered:** `config.py`, `world.py`, `drift.py`, `metrics.py`, `run_trial.py`, `debug_gui.py`, 39 tests (issues #1–#7).
+
+**Results**
+- Analytic drift check (y ≈ L²·d_eps/2b): simulated 0.907 m vs analytic 0.909 m.
+- Same seed gives the same result. Noise is paired across modes (pre-drawn per seed).
+- B1, seed 0, no noise:
+
+| d_eps | final y (m) | distance (m) | outcome |
+|---|---|---|---|
+| 0 | 0.000 | 10.00 | success |
+| 0.0025 | +0.227 | 10.00 | fail (>0.15 m) |
+| 0.005 | +0.454 | 9.99 | fail |
+| 0.01 | collides | 8.08 | collision |
+| 0.02 | collides | 5.58 | collision |
+
+- Noise-only spread (d_eps = 0): 0.100 m lateral, 1.02° heading.
+- Timing: depth render 9.2 ms per frame (160×120); B1 trial 68 ms.
+
+**Decisions**
+- Collisions use `getClosestPoints` (gap ≤ 0), because `getContactPoints` skips static-static pairs.
+- The corridor is closed (floor + ceiling), because PyBullet returns NaN depth for rays that hit nothing.
+- Noise is pre-drawn per seed from `SeedSequence(seed).spawn(3)`. Wheel noise is redrawn every 0.1 s.
+- The robot body is invisible. The GUI uses a stand-in marker.
+- `on_step` hook added to `run_trial` for the debug GUI.
+- `fit_fail_frac` is NaN for B1.
+- `success` is cast to `bool` in `metrics.py`.
+
+**Honesty notes:** drift is injected, not measured from hardware. Simulated depth is cleaner than real depth.
 <!-- Template for each new sprint entry:
 
 ### Sprint N: Name (status)
