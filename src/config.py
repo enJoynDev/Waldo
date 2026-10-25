@@ -53,6 +53,7 @@ NEAR = 0.1  # render clipping plane
 FAR = 10.0
 CAMERA_HEIGHT = 0.4  # our choice, not given in the paper
 CAMERA_MIN_DEPTH = 0.52  # D455 minimum depth; perception discards closer readings
+CAMERA_MAX_DEPTH = 9.9  # readings at the far clip (just under FAR) mean "nothing hit"; discard
 
 # --- injected drift (defaults; applied to the TRUE pose only) ---
 D_EPS_DEFAULT = 0.0  # wheel-scale mismatch eps_R - eps_L, split symmetrically
