@@ -26,5 +26,6 @@ def trial_metrics(true_pose, max_abs_y, collided):
         "dist_travelled": true_pose["x"] - C.START_X,
         # the source paper's metric: how far outside the safety radius around the goal we ended
         "drift_paper": max(0.0, miss - C.DRIFT_SAFETY_RADIUS),
-        "success": (not collided) and abs(lat) < C.SUCCESS_LAT_M,
+        # bool(): the poses are NumPy floats, and a NumPy bool breaks `is True` and JSON dumps
+        "success": bool((not collided) and abs(lat) < C.SUCCESS_LAT_M),
     }
