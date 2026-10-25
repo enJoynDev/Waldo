@@ -203,6 +203,90 @@ def fig3_trajectories(path):
     _finish(fig, ax, path)
 
 
+def load_stress():
+    stress = pd.read_csv(C.STRESS_CSV)
+    stress["abs_lat"] = stress["final_lat_err"].abs()
+    return stress
+
+
+def fig6_skid(df, stress, path):
+    import matplotlib.pyplot as plt
+
+    base = df[(df["d_eps"] == C.DEPTH_SWEEP_D_EPS) & (df["sigma_d"] == 0)]
+    both = pd.concat([base, stress[stress["s_lat"] > 0]])
+    levels = sorted(both["s_lat"].unique())
+    fig, ax = plt.subplots(figsize=(8, 4))
+    for mode, (color, marker) in STYLE.items():
+        means, halves = [], []
+        for s in levels:
+            m, h = mean_ci(both[(both["mode"] == mode) & (both["s_lat"] == s)]["abs_lat"])
+            means.append(m)
+            halves.append(h)
+        ax.errorbar(
+            range(len(levels)),
+            means,
+            yerr=halves,
+            color=color,
+            marker=marker,
+            lw=2,
+            capsize=3,
+            label=mode,
+        )
+    ax.set_yscale("log")
+    ax.set_xticks(range(len(levels)), [f"{s:.0%}" for s in levels])
+    ax.set_xlabel("Lateral skid s_lat (sideways speed as a share of forward speed)")
+    ax.set_ylabel(f"Final |lateral error| (m), d_eps = {EPS_LABELS[C.DEPTH_SWEEP_D_EPS]}")
+    ax.legend(**LEGEND)
+    _finish(fig, ax, path)
+
+
+def fig7_gyro_bias(df, stress, path):
+    import matplotlib.pyplot as plt
+
+    b2 = stress[(stress["mode"] == "B2") & (stress["s_lat"] == 0)]
+    biases = list(C.GYRO_BIAS_SWEEP_DEG_S)
+    styles = {0.0025: ("-", "o"), 0.01: ("--", "s")}
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+    for d, (ls, marker) in styles.items():
+        means, halves, colls = [], [], []
+        for b in biases:
+            g = b2[(b2["d_eps"] == d) & (b2["gyro_bias_deg_s"] == b)]
+            m, h = mean_ci(g["abs_lat"])
+            means.append(m)
+            halves.append(h)
+            colls.append(int(g["collided"].sum()))
+        label = f"B2, d_eps = {EPS_LABELS[d]}"
+        ax.errorbar(
+            range(len(biases)),
+            means,
+            yerr=halves,
+            color=STYLE["B2"][0],
+            ls=ls,
+            marker=marker,
+            lw=2,
+            capsize=3,
+            label=label,
+        )
+        ax2.plot(range(len(biases)), colls, color=STYLE["B2"][0], ls=ls, marker=marker, lw=2)
+        ref = df[(df["mode"] == "C_both") & (df["d_eps"] == d) & (df["sigma_d"] == 0)]
+        ax.axhline(
+            ref["abs_lat"].mean(),
+            color=STYLE["C_both"][0],
+            ls=ls,
+            lw=1.5,
+            label=f"C_both, d_eps = {EPS_LABELS[d]}",
+        )
+    ax.set_yscale("log")
+    for a in (ax, ax2):
+        a.set_xticks(range(len(biases)), [f"{b:g}" for b in biases])
+        a.set_xlabel("Gyro bias (deg/s)")
+    ax.set_ylabel("Final |lateral error| (m), mean and 95% CI")
+    ax2.set_ylabel("Collisions out of 30 (B2)")
+    ax.legend(frameon=False, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2)
+    ax2.spines[["top", "right"]].set_visible(False)
+    _finish(fig, ax, path)
+
+
 def main():
     df = load()
     table = summary_table(df)
@@ -213,6 +297,9 @@ def main():
     fig4_depth_noise(df, C.FIGURES_DIR / "fig4_depth_noise.png")
     fig5_ablation(df, C.FIGURES_DIR / "fig5_ablation.png")
     fig3_trajectories(C.FIGURES_DIR / "fig3_trajectories.png")
+    stress = load_stress()
+    fig6_skid(df, stress, C.FIGURES_DIR / "fig6_skid.png")
+    fig7_gyro_bias(df, stress, C.FIGURES_DIR / "fig7_gyro_bias.png")
 
 
 if __name__ == "__main__":
