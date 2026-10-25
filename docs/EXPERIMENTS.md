@@ -64,7 +64,7 @@ If code disagrees with this file, update this file deliberately.
   - heading error = `-atan((a_left + a_right) / 2)`, positive when the robot is turned left
   - lateral offset = `-(b_left + b_right) * cos(heading) / 2`, positive when the robot is left of the centre
   - confidence = share of wall points explained by the two lines, scaled to 0 if the estimated corridor width is off by 0.5 m or more; 0 if either wall fails to fit
-- Controller: `omega = omega_nominal + k_lat * lat_err + k_head * head_err`, with `omega` clipped.
+- Controller: `omega = -(K_LAT * offset + K_HEAD * heading)`, clipped to +-0.5 rad/s. Positive omega turns left, so a robot left of centre or turned left steers right. `B2` uses the same heading term on the simulated gyro heading.
 - If confidence is below threshold, hold the last correction briefly, then fall back to odometry-only. The threshold is **0.5** (`CONF_THRESHOLD`). It is provisional: good frames on the tuning seeds never scored below 0.82, and no bad-frame scenario has been tested yet. Revisit in Sprint 5.
 
 ### 5a. Perception parameters and Sprint 2 results
@@ -82,6 +82,13 @@ If code disagrees with this file, update this file deliberately.
 - Caveat: these errors are very small because the noise is independent Gaussian per pixel and the fit averages thousands of points. Real depth errors are correlated and biased, so real accuracy would be worse.
 - A half-pixel offset in the back-projection gave a constant 0.34 degree heading bias until the sweep exposed it; fixed in `depth_to_points`.
 - Reproduce: `python src\perception_sweep.py` (about 70 s).
+
+### 5b. Controller gains (Sprint 3)
+
+- Grid search over K_LAT in {0.25, 0.5, 1, 2, 4} and K_HEAD in {0.5, 1, 1.5, 2, 3}, mode `C_both`, tuning seeds 1000 to 1049, at `d_eps` = 0 and 1%, no depth noise (`python src\tune_gains.py`, about 21 minutes).
+- No pair collided (0 of 50 at either drift level). Mean final lateral error at 1% drift ranged from 2.4 mm (K_LAT 4) to 37 mm (K_LAT 0.25, K_HEAD 0.5). Higher K_LAT was better; K_HEAD mattered little at high K_LAT.
+- Chosen: **K_LAT = 2.0, K_HEAD = 2.0** (4.7 mm mean final error and 6.4 mm mean worst offset at 1% drift). Not the best row: K_LAT = 4 is at the edge of the grid, and the grid had no depth noise, which favours aggressive gains.
+- Seeds 1050 to 1099 were not used and remain available for later checks. Reported seeds 0 to 29 were never used for tuning.
 
 ## 6. Sanity check and why the sweep values were chosen
 
